@@ -72,7 +72,7 @@ async function filterDataset(
   repo: string,
   whereClause: string,
   length = 20,
-  retries = 3,
+  retries = 1,
 ): Promise<any[]> {
   const baseUrl = `https://datasets-server.huggingface.co/filter`
   const params = new URLSearchParams({
@@ -89,9 +89,10 @@ async function filterDataset(
       const res = await fetch(`${baseUrl}?${params}`, {
         headers: getHeaders(),
         cache: 'no-store',
+        signal: AbortSignal.timeout(3000),
       })
       if (res.status === 429 && attempt < retries) {
-        await new Promise(r => setTimeout(r, 1000 * Math.pow(2, attempt)))
+        await new Promise(r => setTimeout(r, 800))
         continue
       }
       if (!res.ok) return []
@@ -99,7 +100,7 @@ async function filterDataset(
       return data.rows || []
     } catch {
       if (attempt < retries) {
-        await new Promise(r => setTimeout(r, 500 * (attempt + 1)))
+        await new Promise(r => setTimeout(r, 400))
         continue
       }
       return []
@@ -115,7 +116,7 @@ async function searchDataset(
   repo: string,
   query: string,
   length = 20,
-  retries = 3,
+  retries = 1,
 ): Promise<any[]> {
   const baseUrl = `https://datasets-server.huggingface.co/search`
   const params = new URLSearchParams({
@@ -132,9 +133,10 @@ async function searchDataset(
       const res = await fetch(`${baseUrl}?${params}`, {
         headers: getHeaders(),
         cache: 'no-store',
+        signal: AbortSignal.timeout(3000),
       })
       if (res.status === 429 && attempt < retries) {
-        await new Promise(r => setTimeout(r, 1000 * Math.pow(2, attempt)))
+        await new Promise(r => setTimeout(r, 800))
         continue
       }
       if (!res.ok) return []
@@ -142,7 +144,7 @@ async function searchDataset(
       return data.rows || []
     } catch {
       if (attempt < retries) {
-        await new Promise(r => setTimeout(r, 500 * (attempt + 1)))
+        await new Promise(r => setTimeout(r, 400))
         continue
       }
       return []
